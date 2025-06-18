@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação - DocLynx</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #1a1b26;
+            --sidebar-bg: #24283b;
+            --content-bg: #1f2335;
+            --text-color: #c0caf5;
+            --text-accent: #a9b1d6;
+            --border-color: #414868;
+            --highlight-color: #7aa2f7;
+            --code-bg: #2d2e3a;
+            --green: #9ece6a;
+            --yellow: #e0af68;
+            --red: #f7768e;
+            --gemini-glow: #89b4fa;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--sidebar-bg); }
+        ::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 10px; }
+        .sidebar-item.active {
+            background-color: rgba(122, 162, 247, 0.2);
+            border-left: 3px solid var(--highlight-color);
+            color: white;
+        }
+        .prose h2 { color: white; margin-top: 2rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); }
+        .prose code { background-color: var(--code-bg); color: var(--highlight-color); padding: 0.2rem 0.4rem; border-radius: 5px; font-size: 0.9em; }
+        .prose pre { background-color: var(--code-bg); padding: 1rem; border-radius: 8px; overflow-x: auto; }
+        .prose ul, .prose ol { margin-left: 1rem; }
+        .prose li::marker { color: var(--highlight-color); }
+
+        /* Gemini Feature Styles */
+        .gemini-btn {
+            background-color: rgba(137, 180, 250, 0.1);
+            color: var(--gemini-glow);
+            border: 1px solid var(--gemini-glow);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .gemini-btn:hover {
+            background-color: rgba(137, 180, 250, 0.2);
+            box-shadow: 0 0 15px rgba(137, 180, 250, 0.5);
+        }
+        .gemini-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        #ai-explanation-box {
+            background-color: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        .loader {
+            width: 24px;
+            height: 24px;
+            border: 3px solid var(--gemini-glow);
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-80 h-full bg-sidebar-bg flex-shrink-0 overflow-y-auto transition-all duration-300">
+        <div class="p-6">
+            <h1 class="text-2xl font-bold text-white flex items-center">
+                <i class="fas fa-book-open text-highlight-color mr-3"></i>DocLynx
+            </h1>
+            <p class="text-sm text-text-accent mt-1">Documentação do Projeto</p>
+        </div>
+        <nav class="mt-4 px-2">
+            <ul>
+                <!-- Menu Principal -->
+                <li class="sidebar-item" onclick="showDoc('overview')">
+                    <a href="#" class="flex items-center p-3 rounded-lg hover:bg-content-bg transition-colors duration-200">
+                        <i class="fas fa-home w-6 text-center text-highlight-color"></i><span class="ml-3">Visão Geral</span>
+                    </a>
+                </li>
+                 <li class="sidebar-item" onclick="showDoc('compilation_guide')">
+                    <a href="#" class="flex items-center p-3 rounded-lg hover:bg-content-bg transition-colors duration-200">
+                        <i class="fas fa-box-open w-6 text-center text-highlight-color"></i><span class="ml-3">Guia de Compilação</span>
+                    </a>
+                </li>
+                 <li class="sidebar-item" onclick="showDoc('architecture_history')">
+                    <a href="#" class="flex items-center p-3 rounded-lg hover:bg-content-bg transition-colors duration-200">
+                        <i class="fas fa-timeline w-6 text-center text-highlight-color"></i><span class="ml-3">Histórico e Mudanças</span>
+                    </a>
+                </li>
+                
+                <!-- Estrutura do Projeto -->
+                 <li class="px-3 py-2 mt-4 text-xs font-semibold text-text-accent uppercase tracking-wider">Estrutura do Projeto</li>
+                
+                 <li class="sidebar-item" onclick="showDoc('app_py')">
+                    <a href="#" class="flex items-center p-3 rounded-lg hover:bg-content-bg transition-colors duration-200">
+                        <i class="fab fa-python w-6 text-center text-green"></i><span class="ml-3">app.py</span>
+                    </a>
+                 </li>
+                 <li class="sidebar-item" onclick="showDoc('setup_py')">
+                    <a href="#" class="flex items-center p-3 rounded-lg hover:bg-content-bg transition-colors duration-200">
+                        <i class="fas fa-cogs w-6 text-center text-yellow"></i><span class="ml-3">setup.py</span>
+                    </a>
+                 </li>
+                 <li>
+                    <details class="group">
+                        <summary class="flex items-center p-3 rounded-lg hover:bg-content-bg cursor-pointer transition-colors duration-200">
+                           <i class="fas fa-folder w-6 text-center text-yellow"></i><span class="ml-3">src/</span>
+                        </summary>
+                        <ul class="pl-8">
+                            <li class="sidebar-item" onclick="showDoc('src_controllers')"><a href="#" class="block p-2 rounded-lg hover:bg-content-bg">controllers/</a></li>
+                            <li class="sidebar-item" onclick="showDoc('src_models')"><a href="#" class="block p-2 rounded-lg hover:bg-content-bg">models/</a></li>
+                            <li class="sidebar-item" onclick="showDoc('src_views')"><a href="#" class="block p-2 rounded-lg hover:bg-content-bg">views/</a></li>
+                            <li class="sidebar-item" onclick="showDoc('src_utils')"><a href="#" class="block p-2 rounded-lg hover:bg-content-bg">utils/</a></li>
+                        </ul>
+                    </details>
+                 </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Content Area -->
+    <main class="flex-1 h-full overflow-y-auto bg-content-bg">
+        <div id="content-area" class="p-6 md:p-10">
+            <!-- O conteúdo da documentação será inserido aqui -->
+        </div>
+    </main>
+
+    <script>
+        const documentation = {
+            overview: {
+                title: 'Visão Geral do Projeto DocLynx',
+                content: `
+                    <p class="text-lg">O DocLynx é um sistema de automação com interface gráfica construída em Flet, projetado para processar documentos em formato PDF, extrair informações específicas e consolidá-las em planilhas Excel. O objetivo principal é otimizar processos que envolvem a análise de um grande volume de documentos, reduzindo o tempo e os erros associados à extração manual de dados.</p>
+                    <h2 class="text-2xl font-bold">Fluxo Geral do Sistema</h2>
+                    <ol class="list-decimal list-inside space-y-2">
+                        <li><strong>Interface Gráfica (View):</strong> O usuário interage com uma interface simples, onde pode selecionar pastas de entrada e saída e iniciar o processamento.</li>
+                        <li><strong>Orquestração (Controller):</strong> Ao clicar no botão de iniciar, a View notifica o Controller. O Controller então lê todos os ficheiros PDF da pasta de entrada especificada.</li>
+                        <li><strong>Lógica de Negócio (Model):</strong> Para cada PDF, o Controller invoca o Model, que contém a lógica para abrir o PDF, extrair todo o seu texto e aplicar expressões regulares (regex) para encontrar os dados desejados.</li>
+                        <li><strong>Consolidação:</strong> O Controller reúne as informações extraídas de todos os PDFs.</li>
+                        <li><strong>Geração do Excel (Utils):</strong> Por fim, uma função utilitária é chamada para escrever os dados consolidados numa nova planilha Excel na pasta de saída.</li>
+                    </ol>
+                    <h2 class="text-2xl font-bold">Tecnologias Utilizadas</h2>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong>Flet:</strong> Para a criação da interface gráfica de desktop com Python.</li>
+                        <li><strong>pdfplumber:</strong> Para extração de texto robusta de arquivos PDF.</li>
+                        <li><strong>openpyxl:</strong> Para a manipulação e criação de planilhas Excel (.xlsx).</li>
+                        <li><strong>cx_Freeze:</strong> Para compilar a aplicação Python em um executável (.exe) para Windows.</li>
+                    </ul>
+                `
+            },
+            compilation_guide: {
+                title: 'Guia de Compilação com cx_Freeze',
+                content: `
+                    <p class="text-lg">Para distribuir o DocLynx como um aplicativo independente, usamos o cx_Freeze. O processo requer um ficheiro <code>setup.py</code> e alguns passos no terminal.</p>
+                    <h2 class="text-2xl font-bold">Passo a Passo</h2>
+                    <ol class="list-decimal list-inside space-y-3">
+                        <li>
+                            <strong>Criar um Ambiente Virtual (Recomendado):</strong>
+                            <pre><code class="language-bash">python -m venv venv\n.\\venv\\Scripts\\activate</code></pre>
+                        </li>
+                        <li>
+                            <strong>Instalar as Dependências:</strong>
+                            <pre><code class="language-bash">pip install -r requirements.txt\npip install cx_Freeze</code></pre>
+                        </li>
+                        <li>
+                            <strong>Executar o Build:</strong> Navegue até a pasta raiz do projeto (onde o <code>setup.py</code> se encontra) e execute o comando:
+                            <pre><code class="language-bash">python setup.py build</code></pre>
+                        </li>
+                        <li>
+                            <strong>Encontrar o Executável:</strong> Se tudo correr bem, uma pasta <code>build</code> será criada. Dentro dela, encontrará uma pasta como <code>exe.win-amd64-3.x</code>, que contém o <code>Doclynx.exe</code> e todos os seus ficheiros de suporte.
+                        </li>
+                    </ol>
+                `
+            },
+            architecture_history: {
+                title: 'Histórico e Decisões de Arquitetura',
+                content: `
+                    <p class="text-lg">Durante o desenvolvimento e, principalmente, na fase de compilação, o projeto passou por uma refatoração estrutural significativa para resolver problemas de importação de módulos com o <code>cx_Freeze</code>.</p>
+                    <div class="my-6">
+                        <button id="summarize-btn" class="gemini-btn">✨ Resumir Histórico com IA</button>
+                    </div>
+                    <div id="ai-summary-box" class="hidden"></div>
+                    <h2 class="text-2xl font-bold">Estrutura Inicial vs. Final</h2>
+                    <p>Inicialmente, o projeto seguia uma estrutura onde o ponto de entrada <code>app.py</code> estava localizado <strong>dentro</strong> da pasta <code>src/</code>. Embora isto funcionasse bem em modo de desenvolvimento, causava um <code>ModuleNotFoundError</code> após a compilação, pois o executável não conseguia localizar os pacotes vizinhos (como <code>controllers</code>, <code>models</code>).</p>
+                    <p class="mt-2">Tentamos várias abordagens, como adicionar <code>__init__.py</code> e manipular o <code>sys.path</code>, mas estas se mostraram instáveis.</p>
+                    <p class="mt-4">A <strong>solução definitiva</strong> foi mover o <code>app.py</code> para a <strong>pasta raiz</strong> do projeto. Esta mudança exigiu os seguintes ajustes:</p>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong>Imports Absolutos em <code>app.py</code>:</strong> Todas as importações de módulos locais no <code>app.py</code> foram prefixadas com <code>src.</code>. Exemplo: <code>from src.controllers.interface_controller import InterfaceController</code>.</li>
+                        <li><strong>Imports Relativos em <code>src/</code>:</strong> Para a comunicação <strong>entre</strong> os módulos dentro de <code>src/</code>, passamos a usar importações relativas explícitas.
+                            <ul class="list-disc list-inside ml-6 mt-2 space-y-1">
+                                <li>Para importar de um pacote vizinho (ex: de <code>controllers</code> para <code>models</code>): <code>from ..models import ...</code></li>
+                                <li>Para importar de um ficheiro no mesmo pacote: <code>from . import ...</code></li>
+                            </ul>
+                        </li>
+                        <li><strong>Atualização do <code>setup.py</code>:</strong> O script de build foi atualizado para apontar para o <code>app.py</code> na raiz como o executável principal.</li>
+                    </ul>
+                    <p class="mt-4 font-semibold text-white">Esta estrutura final provou ser a mais robusta, funcionando perfeitamente tanto em desenvolvimento quanto na versão compilada, e é a arquitetura recomendada para projetos Flet que serão distribuídos com cx_Freeze.</p>
+                `
+            },
+            app_py: {
+                title: 'app.py (Raiz do Projeto)',
+                content: `
+                    <h2 class="text-xl font-semibold">▶️ Objetivo</h2>
+                    <p>Ponto de entrada da aplicação. Suas responsabilidades são:</p>
+                    <ul class="list-disc list-inside">
+                        <li>Importar os componentes principais da aplicação (Controller, Model, View).</li>
+                        <li>Definir a função principal <code>start_app</code> que inicializa a janela e os componentes.</li>
+                        <li>Iniciar a aplicação Flet com <code>ft.app()</code>.</li>
+                    </ul>
+                    <h2 class="text-xl font-semibold mt-6">⚙️ Estrutura Chave</h2>
+                    <pre><code class="language-python"># Imports absolutos a partir de 'src'\nfrom src.controllers.interface_controller import InterfaceController\n\n# Função principal que monta a aplicação\ndef start_app(page: ft.Page):\n    # ... instancia MVC ...\n\n# Ponto de entrada padrão do Python\nif __name__ == "__main__":\n    ft.app(target=start_app, assets_dir="assets")</code></pre>
+                `
+            },
+            setup_py: {
+                title: 'setup.py (Build Script)',
+                content: `
+                    <h2 class="text-xl font-semibold">▶️ Objetivo</h2>
+                    <p>Este ficheiro é a "receita" para o <code>cx_Freeze</code> compilar o projeto. Ele define qual é o script principal, quais pacotes devem ser incluídos, e quais ficheiros e pastas adicionais (como <code>assets/</code> e <code>config.json</code>) precisam ser copiados para a pasta final do build.</p>
+                    <h2 class="text-xl font-semibold mt-6">⚙️ Seções Importantes</h2>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><code>packages</code>: Lista explícita de todos os pacotes necessários para o funcionamento, incluindo os da nossa pasta <code>src</code> (ex: <code>"src.controllers"</code>).</li>
+                        <li><code>include_files</code>: Define os ficheiros e pastas que devem ser copiados junto com o executável. Crucial para imagens, ícones e ficheiros de configuração.</li>
+                        <li><code>Executable(...)</code>: Aponta para o script principal (<code>app.py</code>), define o nome do executável final (<code>Doclynx.exe</code>) e o ícone da aplicação.</li>
+                    </ul>
+                `
+            },
+            src_controllers: {
+                title: 'src/controllers/',
+                content: `
+                    <h2 class="text-xl font-semibold">▶️ Objetivo</h2>
+                    <p>Atua como o intermediário entre a Visão (UI) e o Modelo (lógica de dados). O controlador não sabe como a interface é desenhada, nem como os dados são extraídos; ele apenas orquestra o fluxo.</p>
+                    <h2 class="text-xl font-semibold mt-6">🔁 Fluxo Típico</h2>
+                    <ol class="list-decimal list-inside">
+                        <li>Recebe um evento da View (ex: "o botão Iniciar foi clicado").</li>
+                        <li>Pede ao Model para executar uma ação (ex: "processe os PDFs nesta pasta").</li>
+                        <li>Recebe os dados processados de volta do Model.</li>
+                        <li>Envia os resultados para a View para serem exibidos ao usuário (ex: "mostre esta mensagem de sucesso").</li>
+                    </ol>
+                `
+            },
+            src_models: {
+                title: 'src/models/',
+                content: `
+                    <h2 class="text-xl font-semibold">▶️ Objetivo</h2>
+                    <p>Contém toda a lógica de negócio e manipulação de dados. É a parte "inteligente" da aplicação.</p>
+                    <h2 class="text-xl font-semibold mt-6">✅ Responsabilidades</h2>
+                    <ul class="list-disc list-inside">
+                        <li>Abrir e ler o texto de arquivos PDF.</li>
+                        <li>Aplicar expressões regulares para encontrar e extrair informações específicas.</li>
+                        <li>Estruturar os dados extraídos de forma organizada (ex: em dicionários ou objetos).</li>
+                        <li>Não tem nenhum conhecimento sobre a interface gráfica.</li>
+                    </ul>
+                `
+            },
+            src_views: {
+                title: 'src/views/',
+                content: `
+                    <h2 class="text-xl font-semibold">▶️ Objetivo</h2>
+                    <p>Responsável por toda a parte visual da aplicação. Define como os componentes são desenhados na tela e como eles se parecem.</p>
+                     <h2 class="text-xl font-semibold mt-6">✅ Responsabilidades</h2>
+                    <ul class="list-disc list-inside">
+                        <li>Criar todos os elementos da interface (botões, campos de texto, etc.) usando os componentes do Flet.</li>
+                        <li>Exibir dados recebidos do Controller.</li>
+                        <li>Capturar interações do usuário (cliques, digitação) e notificar o Controller sobre elas.</li>
+                        <li>Não contém lógica de negócio. É puramente visual.</li>
+                    </ul>
+                `
+            },
+            src_utils: {
+                title: 'src/utils/',
+                content: `
+                    <h2 class="text-xl font-semibold">▶️ Objetivo</h2>
+                    <p>Uma coleção de módulos "ajudantes" que contêm código genérico e reutilizável, para evitar repetição e manter o resto do código limpo.</p>
+                     <h2 class="text-xl font-semibold mt-6">📖 Exemplos de Módulos</h2>
+                    <ul class="list-disc list-inside">
+                        <li><code>excel_utils.py</code>: Funções para criar e salvar planilhas Excel.</li>
+                        <li><code>logger_config.py</code>: Configuração do sistema de logging para registrar eventos e erros.</li>
+                        <li>...outros módulos de ajuda que possam ser necessários.</li>
+                    </ul>
+                `
+            },
+        };
+
+        const contentArea = document.getElementById('content-area');
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+
+        async function callGeminiAPI(prompt, button) {
+            button.disabled = true;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<span class="loader"></span> Processando...';
+
+            const apiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{
+                    parts: [{ text: prompt }]
+                }]
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const result = await response.json();
+                
+                button.disabled = false;
+                button.innerHTML = originalText;
+
+                if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
+                    return result.candidates[0].content.parts[0].text;
+                } else {
+                    return "Não foi possível obter uma resposta da IA. Verifique a estrutura do retorno.";
+                }
+            } catch (error) {
+                console.error("Erro ao chamar a API do Gemini:", error);
+                button.disabled = false;
+                button.innerHTML = originalText;
+                return `Erro ao processar a solicitação: ${error.message}`;
+            }
+        }
+        
+        function setupAIListeners() {
+            const explainBtn = document.getElementById('explain-code-btn');
+            if(explainBtn) {
+                explainBtn.onclick = async (e) => {
+                    const codeBlocks = document.querySelectorAll('#content-area pre code');
+                    const aiBox = document.getElementById('ai-explanation-box');
+                    aiBox.innerHTML = '<div class="flex items-center justify-center"><span class="loader"></span><p class="ml-4">Gerando explicações para o código na página...</p></div>';
+                    aiBox.classList.remove('hidden');
+
+                    let fullExplanation = '<h3 class="text-xl font-bold text-white mb-4">✨ Explicação do Código com IA</h3>';
+                    
+                    for(let i = 0; i < codeBlocks.length; i++) {
+                        const code = codeBlocks[i].innerText;
+                        const prompt = `Explique o seguinte trecho de código Python de forma simples e clara, como se fosse para um iniciante. Retorne a resposta em HTML formatado (use tags como <p>, <strong>, <ul>, <li>):\n\n\`\`\`python\n${code}\n\`\`\``;
+                        const explanation = await callGeminiAPI(prompt, e.target);
+                        fullExplanation += `
+                            <div class="mb-6">
+                                <h4 class="text-lg font-semibold text-highlight-color mb-2">Bloco de Código ${i + 1}</h4>
+                                <div class="prose max-w-none text-text-accent">${explanation.replace(/\n/g, '<br>')}</div>
+                            </div>
+                        `;
+                    }
+                    aiBox.innerHTML = fullExplanation;
+                };
+            }
+            
+            const summarizeBtn = document.getElementById('summarize-btn');
+            if(summarizeBtn) {
+                summarizeBtn.onclick = async (e) => {
+                     const aiBox = document.getElementById('ai-summary-box');
+                     aiBox.innerHTML = '<div class="flex items-center justify-center"><span class="loader"></span><p class="ml-4">Gerando resumo...</p></div>';
+                     aiBox.classList.remove('hidden');
+
+                     const textToSummarize = documentation['architecture_history'].content;
+                     const prompt = `Resuma o seguinte texto sobre as mudanças de arquitetura de um projeto em formato de changelog, com bullet points. Use a tag <strong> para os títulos. Retorne a resposta em HTML formatado:\n\n${textToSummarize}`;
+                     const summary = await callGeminiAPI(prompt, e.target);
+
+                     aiBox.innerHTML = `
+                        <h3 class="text-xl font-bold text-white mb-4">✨ Resumo Gerado por IA</h3>
+                        <div class="prose max-w-none text-text-accent">${summary.replace(/\n/g, '<br>')}</div>
+                     `;
+                }
+            }
+        }
+
+        window.showDoc = function(key) {
+            const doc = documentation[key];
+            if (!doc) {
+                contentArea.innerHTML = `<h1 class="text-3xl font-bold text-red">Erro: Documentação não encontrada</h1>`;
+                return;
+            };
+
+            let aiButtonHtml = '';
+            if (doc.content.includes('<pre>')) {
+                aiButtonHtml = `
+                    <div class="my-6">
+                        <button id="explain-code-btn" class="gemini-btn">✨ Explicar Código com IA</button>
+                    </div>
+                    <div id="ai-explanation-box" class="hidden"></div>`;
+            }
+
+            contentArea.innerHTML = `
+                <div class="animate-on-load">
+                    <div class="flex justify-between items-center">
+                        <h1 class="text-3xl md:text-4xl font-bold text-white mb-6 pb-4 border-b border-border-color flex-grow">${doc.title}</h1>
+                    </div>
+                    ${aiButtonHtml}
+                    <div class="prose max-w-none text-text-accent">${doc.content}</div>
+                </div>
+            `;
+            
+            sidebarItems.forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const activeItem = [...sidebarItems].find(item => item.getAttribute('onclick') === `showDoc('${key}')`);
+            if (activeItem) {
+                activeItem.classList.add('active');
+                if (activeItem.closest('details')) {
+                    activeItem.closest('details').open = true;
+                }
+            }
+            
+            // Re-attach event listeners for AI buttons every time content is rendered
+            setupAIListeners();
+        }
+
+        // Show overview on initial load and set active class
+        const firstItem = document.querySelector('.sidebar-item');
+        firstItem.classList.add('active');
+        showDoc('overview');
+
+    </script>
+</body>
+</html>
